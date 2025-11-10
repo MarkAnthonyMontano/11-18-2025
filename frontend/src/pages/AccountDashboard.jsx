@@ -1,0 +1,223 @@
+import React, { useState, useEffect, useContext, useRef } from "react";
+import { SettingsContext } from "../App";
+
+import {
+  ListAlt,
+  PersonAdd,
+  LockReset,
+  People,
+  AssignmentInd,
+  TableChart,
+  Security,
+  School,
+  SupervisorAccount,
+  AdminPanelSettings,
+  Info,
+} from "@mui/icons-material";
+import { Link } from "react-router-dom";
+import { Box } from "@mui/material";
+import axios from "axios";
+import Unauthorized from "../components/Unauthorized";
+import LoadingOverlay from "../components/LoadingOverlay";
+
+
+const AccountDashboard = () => {
+
+  const settings = useContext(SettingsContext);
+
+  const [titleColor, setTitleColor] = useState("#000000");
+  const [subtitleColor, setSubtitleColor] = useState("#555555");
+  const [borderColor, setBorderColor] = useState("#000000");
+  const [mainButtonColor, setMainButtonColor] = useState("#1976d2");
+  const [subButtonColor, setSubButtonColor] = useState("#ffffff");   // ✅ NEW
+  const [stepperColor, setStepperColor] = useState("#000000");       // ✅ NEW
+
+  const [fetchedLogo, setFetchedLogo] = useState(null);
+  const [companyName, setCompanyName] = useState("");
+  const [shortTerm, setShortTerm] = useState("");
+  const [campusAddress, setCampusAddress] = useState("");
+
+  useEffect(() => {
+    if (!settings) return;
+
+    // 🎨 Colors
+    if (settings.title_color) setTitleColor(settings.title_color);
+    if (settings.subtitle_color) setSubtitleColor(settings.subtitle_color);
+    if (settings.border_color) setBorderColor(settings.border_color);
+    if (settings.main_button_color) setMainButtonColor(settings.main_button_color);
+    if (settings.sub_button_color) setSubButtonColor(settings.sub_button_color);   // ✅ NEW
+    if (settings.stepper_color) setStepperColor(settings.stepper_color);           // ✅ NEW
+
+    // 🏫 Logo
+    if (settings.logo_url) {
+      setFetchedLogo(`http://localhost:5000${settings.logo_url}`);
+    } else {
+      setFetchedLogo(EaristLogo);
+    }
+
+    // 🏷️ School Information
+    if (settings.company_name) setCompanyName(settings.company_name);
+    if (settings.short_term) setShortTerm(settings.short_term);
+    if (settings.campus_address) setCampusAddress(settings.campus_address);
+
+  }, [settings]);
+
+
+  // Also put it at the very top
+  const [userID, setUserID] = useState("");
+  const [user, setUser] = useState("");
+  const [userRole, setUserRole] = useState("");
+
+  const [hasAccess, setHasAccess] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+
+  const pageId = 97;
+
+  //Put this After putting the code of the past code
+  useEffect(() => {
+
+    const storedUser = localStorage.getItem("email");
+    const storedRole = localStorage.getItem("role");
+    const storedID = localStorage.getItem("person_id");
+
+    if (storedUser && storedRole && storedID) {
+      setUser(storedUser);
+      setUserRole(storedRole);
+      setUserID(storedID);
+
+      if (storedRole === "registrar") {
+        checkAccess(storedID);
+      } else {
+        window.location.href = "/login";
+      }
+    } else {
+      window.location.href = "/login";
+    }
+  }, []);
+
+  const checkAccess = async (userID) => {
+    try {
+      const response = await axios.get(`http://localhost:5000/api/page_access/${userID}/${pageId}`);
+      if (response.data && response.data.page_privilege === 1) {
+        setHasAccess(true);
+      } else {
+        setHasAccess(false);
+      }
+    } catch (error) {
+      console.error('Error checking access:', error);
+      setHasAccess(false);
+      if (error.response && error.response.data.message) {
+        console.log(error.response.data.message);
+      } else {
+        console.log("An unexpected error occurred.");
+      }
+      setLoading(false);
+    }
+  };
+
+
+
+
+
+
+
+
+
+
+  // Put this at the very bottom before the return 
+  if (loading || hasAccess === null) {
+    return <LoadingOverlay open={loading} message="Check Access" />;
+  }
+
+  if (!hasAccess) {
+    return (
+      <Unauthorized />
+    );
+  }
+
+
+
+
+
+
+
+const menuItems = [
+  { label: "ADD FACULTY ACCOUNTS", icon: <PersonAdd style={{ fontSize: 36 }} />, path: "/register_prof" },
+  { label: "ADD REGISTRAR'S ACCOUNT", icon: <PersonAdd style={{ fontSize: 36 }} />, path: "/register_registrar" },
+  { label: "ADD STUDENT'S ACCOUNT", icon: <PersonAdd style={{ fontSize: 36 }} />, path: "/register_student" },
+  { label: "APPLICANT INFORMATION", icon: <Info style={{ fontSize: 36 }} />, path: "/super_admin_applicant_dashboard1" },
+  { label: "STUDENT INFORMATION", icon: <Info style={{ fontSize: 36 }} />, path: "/super_admin_student_dashboard1" },
+  { label: "USER PAGE ACCESS", icon: <Security style={{ fontSize: 36 }} />, path: "/user_page_access" },
+  { label: "PAGE TABLE", icon: <TableChart style={{ fontSize: 36 }} />, path: "/page_crud" },
+  { label: "RESET PASSWORD", icon: <LockReset style={{ fontSize: 36 }} />, path: "/registrar_reset_password" },
+  { label: "APPLICANT RESET PASSWORD", icon: <People style={{ fontSize: 36 }} />, path: "/superadmin_applicant_reset_password" },
+  { label: "STUDENT RESET PASSWORD", icon: <School style={{ fontSize: 36 }} />, path: "/superadmin_student_reset_password" },
+  { label: "FACULTY RESET PASSWORD", icon: <SupervisorAccount style={{ fontSize: 36 }} />, path: "/superadmin_faculty_reset_password" },
+  { label: "REGISTRAR RESET PASSWORD", icon: <AdminPanelSettings style={{ fontSize: 36 }} />, path: "/superadmin_registrar_reset_password" },
+];
+
+
+  return (
+    <Box
+      sx={{
+        height: "calc(100vh - 150px)",
+        overflowY: "auto",
+        paddingRight: 1,
+        backgroundColor: "transparent",
+      }}
+    >
+      <div className="p-2 px-10 w-full">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {menuItems.map((item, index) => (
+            <div className="relative" key={index}>
+              <Link to={item.path}>
+
+                {/* ICON BOX */}
+                <div
+                  className="absolute left-16 top-12 rounded-lg p-4 w-enough"
+                  style={{
+                    backgroundColor: "white",
+                    border: `5px solid ${borderColor}`,
+                    color: titleColor,
+                    transition: "0.2s ease-in-out",
+                  }}
+                >
+                  {item.icon}
+                </div>
+
+                {/* MAIN BUTTON */}
+                <button
+                  className="rounded-lg p-4 w-80 h-36 font-medium mt-20 ml-8 flex items-end justify-center"
+                  style={{
+                    backgroundColor: "white",
+                    color: titleColor,
+                    border: `5px solid ${borderColor}`,
+                    cursor: "pointer",
+                    transition: "0.2s ease-in-out",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = mainButtonColor;
+                    e.currentTarget.style.color = "#ffffff";
+                    e.currentTarget.style.border = `5px solid ${borderColor}`;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = "white";
+                    e.currentTarget.style.color = titleColor;
+                    e.currentTarget.style.border = `5px solid ${borderColor}`;
+                  }}
+                >
+                  {item.label}
+                </button>
+
+              </Link>
+            </div>
+          ))}
+
+        </div>
+      </div>
+    </Box>
+  );
+};
+
+export default AccountDashboard;

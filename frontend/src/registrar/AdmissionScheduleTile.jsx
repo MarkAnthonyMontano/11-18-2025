@@ -189,6 +189,7 @@ const ScheduleHoverTile = () => {
 
             <hr style={{ border: "1px solid #ccc", width: "100%" }} />
             <br />
+            <br />
             <TableContainer component={Paper} sx={{ width: '100%', border: `2px solid ${borderColor}`, }}>
                 <Table>
                     <TableHead sx={{ backgroundColor: settings?.header_color || "#1976d2" }}>
@@ -286,6 +287,7 @@ const ScheduleHoverTile = () => {
             </TableContainer>
 
             <br />
+            <br />
 
             <Grid container spacing={3}>
                 {filteredSchedules.map((schedule) => (
@@ -318,7 +320,7 @@ const ScheduleHoverTile = () => {
                                     p: 1.5,
                                 }}
                             >
-                                <Typography fontWeight="bold" fontSize="16px">
+                                <Typography fontWeight="bold" fontSize="16px" sx={{textAlign: "center"}}>
                                     Schedule #{schedule.schedule_id}
                                 </Typography>
                             </Box>

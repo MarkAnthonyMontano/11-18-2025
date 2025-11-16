@@ -144,7 +144,9 @@ const SearchCertificateOfRegistration = () => {
 
 
 
-  const [studentNumber, setStudentNumber] = useState("");
+  const [studentNumber, setStudentNumber] = useState(() => {
+    return localStorage.getItem("studentNumberForCOR") || "";
+  });
   const [debouncedStudentNumber, setDebouncedStudentNumber] = useState("");
 
 
@@ -222,8 +224,11 @@ const SearchCertificateOfRegistration = () => {
     }
   }, [studentNumber]);
 
-
-
+  useEffect(() => {
+    if (studentNumber) {
+      localStorage.removeItem("studentNumberForCOR");
+    }
+  }, [studentNumber]);
 
   // Put this at the very bottom before the return 
   if (loading || hasAccess === null) {

@@ -2376,6 +2376,45 @@ app.get("/api/all-applicants", async (req, res) => {
   }
 });
 
+// UPDATED --------------------------------------------------------- 11/16/2025
+
+app.post("/unassign_all_from_schedule", async (req, res) => {
+  const { schedule_id } = req.body;
+  try {
+    // ✅ Correct table: exam_applicants
+    await db.execute("UPDATE exam_applicants SET schedule_id = NULL WHERE schedule_id = ?", [schedule_id]);
+    res.json({ success: true, message: `All applicants unassigned from schedule ${schedule_id}` });
+  } catch (err) {
+    console.error("Error unassigning all applicants:", err);
+    res.status(500).json({ error: "Failed to unassign all applicants" });
+  }
+});
+
+app.post("/unassign_schedule", async (req, res) => {
+  const { applicant_number } = req.body;
+
+  if (!applicant_number) {
+    return res.status(400).json({ error: "Applicant number is required." });
+  }
+
+  try {
+    const [result] = await db.query(
+      `DELETE FROM admission.exam_applicants WHERE applicant_id = ?`,
+      [applicant_number]
+    );
+
+    if (result.affectedRows > 0) {
+      res.json({ success: true, message: `Applicant ${applicant_number} unassigned.` });
+    } else {
+      res.status(404).json({ error: "Applicant not found or not assigned." });
+    }
+  } catch (err) {
+    console.error("Error unassigning schedule:", err);
+    res.status(500).json({ error: "Database error" });
+  }
+});
+
+
 // ================= VERIFIED & ECAT APPLICANTS =================
 // ================= VERIFIED & ECAT APPLICANTS =================
 app.get("/api/verified-ecat-applicants", async (req, res) => {
@@ -2426,6 +2465,7 @@ app.get("/api/verified-ecat-applicants", async (req, res) => {
     res.status(500).send("Server error");
   }
 });
+
 
 
 // ================= ENTRANCE EXAM SCHEDULE =================

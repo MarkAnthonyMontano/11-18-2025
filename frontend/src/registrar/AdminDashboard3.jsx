@@ -134,38 +134,42 @@ const AdminDashboard3 = () => {
     strand: "",
   });
   const location = useLocation();
+
   const queryParams = new URLSearchParams(location.search);
-  const queryPersonId = queryParams.get("person_id");
-
-  const [hasAccess, setHasAccess] = useState(null);
-  const [loading, setLoading] = useState(false);
-
-  const pageId = 3;
-
-  const [employeeID, setEmployeeID] = useState("");
+  const queryPersonId = queryParams.get("person_id")?.trim() || "";
 
   useEffect(() => {
-
     const storedUser = localStorage.getItem("email");
     const storedRole = localStorage.getItem("role");
-    const storedID = localStorage.getItem("person_id");
-    const storedEmployeeID = localStorage.getItem("employee_id");
+    const loggedInPersonId = localStorage.getItem("person_id");
 
-    if (storedUser && storedRole && storedID) {
-      setUser(storedUser);
-      setUserRole(storedRole);
-      setUserID(storedID);
-      setEmployeeID(storedEmployeeID);
-
-      if (storedRole === "registrar") {
-        checkAccess(storedEmployeeID);
-      } else {
-        window.location.href = "/login";
-      }
-    } else {
+    if (!storedUser || !storedRole || !loggedInPersonId) {
       window.location.href = "/login";
+      return;
     }
-  }, []);
+
+    setUser(storedUser);
+    setUserRole(storedRole);
+
+    // Roles allowed
+    const allowedRoles = ["registrar", "applicant", "superadmin"];
+    if (!allowedRoles.includes(storedRole)) {
+      window.location.href = "/login";
+      return;
+    }
+
+    // ❌ DO NOT load sessionStorage default
+    // ❌ DO NOT auto-load from previous page
+    // ❌ Only load if URL has ?person_id=
+    if (queryPersonId !== "") {
+      sessionStorage.setItem("admin_edit_person_id", queryPersonId);
+      setUserID(queryPersonId);
+    } else {
+      // clear old saved user
+      sessionStorage.removeItem("admin_edit_person_id");
+      setUserID("");
+    }
+  }, [queryPersonId]);
 
   const checkAccess = async (employeeID) => {
     try {

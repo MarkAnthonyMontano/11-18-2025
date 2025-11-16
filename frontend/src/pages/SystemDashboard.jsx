@@ -137,7 +137,15 @@ const SystemDashboardPanel = () => {
         { title: "SECTION PANEL FORM", link: "/section_panel", icon: Class, page_id: 57 },
         { title: "SEMESTER PANEL FORM", link: "/semester_panel", icon: Timeline, page_id: 58 },
         { title: "CHANGE GRADING PERIOD", link: "/change_grade_period", icon: ChangeCircle, page_id: 14 },
+   
+      ],
+    },
+      {
+      label: "PAYMENT MODULE / EVALUATION CRUD",
+      items: [
+      
         { title: "EVALUATION MANAGEMENT", link: "/evaluation_crud", icon: HelpOutlineIcon, page_id: 23 },
+        { title: "TOSF CRUD", link: "/tosf_crud", icon: HelpOutlineIcon, page_id: 99 },
       ],
     },
     {

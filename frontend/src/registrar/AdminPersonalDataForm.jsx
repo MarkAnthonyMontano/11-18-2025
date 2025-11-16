@@ -51,54 +51,75 @@ const settings = useContext(SettingsContext);
     const [userID, setUserID] = useState("");
     const [user, setUser] = useState("");
     const [userRole, setUserRole] = useState("");
-    const [person, setPerson] = useState({
-        profile_img: "",
-        campus: "",
-        academicProgram: "",
-        classifiedAs: "",
-        program: "",
-        program2: "",
-        program3: "",
-        yearLevel: "",
-        last_name: "",
-        first_name: "",
-        middle_name: "",
-        extension: "",
-        nickname: "",
-        height: "",
-        weight: "",
-        lrnNumber: "",
-        gender: "",
-        pwdType: "",
-        pwdId: "",
-        birthOfDate: "",
-        age: "",
-        birthPlace: "",
-        languageDialectSpoken: "",
-        citizenship: "",
-        religion: "",
-        civilStatus: "",
-        tribeEthnicGroup: "",
-        cellphoneNumber: "",
-        emailAddress: "",
-        telephoneNumber: "",
-        facebookAccount: "",
-        presentStreet: "",
-        presentBarangay: "",
-        presentZipCode: "",
-        presentRegion: "",
-        presentProvince: "",
-        presentMunicipality: "",
-        presentDswdHouseholdNumber: "",
-        permanentStreet: "",
-        permanentBarangay: "",
-        permanentZipCode: "",
-        permanentRegion: "",
-        permanentProvince: "",
-        permanentMunicipality: "",
-        permanentDswdHouseholdNumber: "",
-    });
-
+   const [person, setPerson] = useState({
+          applicant_number: "",
+          profile_img: "",
+          campus: "",
+          academicProgram: "",
+          classifiedAs: "",
+          program: "",
+          program2: "",
+          program3: "",
+          yearLevel: "",
+          last_name: "",
+          first_name: "",
+          middle_name: "",
+          extension: "",
+          nickname: "",
+          height: "",
+          weight: "",
+          lrnNumber: "",
+          gender: "",
+          pwdType: "",
+          pwdId: "",
+          birthOfDate: "",
+          age: "",
+          birthPlace: "",
+          languageDialectSpoken: "",
+          citizenship: "",
+          religion: "",
+          civilStatus: "",
+          tribeEthnicGroup: "",
+          otherEthnicGroup: "",
+          cellphoneNumber: "",
+          emailAddress: "",
+          telephoneNumber: "",
+          facebookAccount: "",
+          presentStreet: "",
+          presentBarangay: "",
+          presentZipCode: "",
+          presentRegion: "",
+          presentProvince: "",
+          presentMunicipality: "",
+          presentDswdHouseholdNumber: "",
+          permanentStreet: "",
+          permanentBarangay: "",
+          permanentZipCode: "",
+          permanentRegion: "",
+          permanentProvince: "",
+          permanentMunicipality: "",
+          permanentDswdHouseholdNumber: "",
+          father_deceased: "",
+          father_family_name: "", father_given_name: "", father_middle_name: "", father_ext: "", father_contact: "", father_occupation: "",
+          father_income: "", father_email: "", mother_deceased: "", mother_family_name: "", mother_given_name: "", mother_middle_name: "",
+          mother_contact: "", mother_occupation: "", mother_income: "", guardian: "", guardian_family_name: "", guardian_given_name: "",
+          guardian_middle_name: "", guardian_ext: "", guardian_nickname: "", guardian_address: "", guardian_contact: "", guardian_email: "",
+          schoolLevel: "",
+          schoolLastAttended: "",
+          schoolAddress: "",
+          courseProgram: "",
+          honor: "",
+          generalAverage: "",
+          yearGraduated: "",
+          schoolLevel1: "",
+          schoolLastAttended1: "",
+          schoolAddress1: "",
+          courseProgram1: "",
+          honor1: "",
+          generalAverage1: "",
+          yearGraduated1: "",
+          strand: "",
+      });
     
     // ✅ Fetch person data from backend
     const fetchPersonData = async (id) => {
@@ -953,137 +974,160 @@ const settings = useContext(SettingsContext);
                                         </td>
                                     </tr>
                                     <tr>
-                                        {/* SEX */}
-                                        <td
-                                            colSpan={20}
-                                            style={{
-                                                border: "1px solid black",
-                                                textAlign: "left",
-    
-                                                fontWeight: "bold",
-                                                fontSize: "14px",
-                                                verticalAlign: "top",
-                                                fontFamily: "Times new Roman",
-                                            }}
-                                        >
-                                            SEX
-                                            <div
-                                                style={{
-                                                    display: "flex",
-                                                    justifyContent: "center",
-                                                    gap: "40px",
-                                                    alignItems: "center",
-                                                    fontFamily: "Times new Roman",
-                                                    width: "100%",
-                                                    marginTop: "5px",
-                                                }}
-                                            >
-                                                <label
-                                                    style={{
-                                                        display: "flex",
-                                                        alignItems: "center",
-                                                        gap: "5px",
-                                                        fontSize: "15px",
-                                                        fontFamily: "Times new Roman",
-                                                        marginBottom: "10px"
-                                                    }}
-                                                >
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={person.gender === 0}
-                                                        readOnly
-                                                        style={{
-                                                            width: "20px",
-                                                            height: "20px",
-                                                            border: "1px solid black",
-                                                            backgroundColor: "white",
-    
-                                                            appearance: "none",
-                                                            WebkitAppearance: "none",
-                                                            MozAppearance: "none",
-                                                            display: "inline-block",
-                                                            position: "relative",
-                                                        }}
-                                                        className="custom-checkbox"
-                                                    />
-                                                    Male
-                                                </label>
-    
-                                                <label
-                                                    style={{
-                                                        display: "flex",
-                                                        alignItems: "center",
-                                                        gap: "5px",
-                                                        fontSize: "15px",
-                                                        fontFamily: "Times new Roman",
-                                                        marginBottom: "10px"
-                                                    }}
-                                                >
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={person.gender === 1}
-                                                        readOnly
-                                                        style={{
-                                                            width: "20px",
-                                                            height: "20px",
-                                                            border: "1px solid black",
-                                                            backgroundColor: "white",
-                                                            appearance: "none",
-                                                            WebkitAppearance: "none",
-                                                            MozAppearance: "none",
-    
-                                                            display: "inline-block",
-                                                            position: "relative",
-                                                        }}
-                                                        className="custom-checkbox"
-                                                    />
-                                                    Female
-                                                </label>
-                                            </div>
-    
-                                            {/* ✅ Style block for ✓ checkmark */}
-                                            <style>
-                                                {`
-          .custom-checkbox:checked::after {
-            content: '✓';
-            position: absolute;
-            top: -2px;
-            left: 3px;
-            font-size: 16px;
-            color: black;
-          }
-        `}
-                                            </style>
-                                        </td>
-    
-    
-    
-    
-                                        {/* E-MAIL ADDRESS */}
-                                        <td colSpan={20} style={{
+                                    {/* SEX */}
+                                    <td
+                                        colSpan={15}
+                                        style={{
                                             border: "1px solid black",
                                             textAlign: "left",
-    
+
+                                            fontWeight: "bold",
                                             fontSize: "14px",
                                             verticalAlign: "top",
                                             fontFamily: "Times new Roman",
-                                        }}>
-                                            <div style={{ fontWeight: "bold" }}>E-MAIL ADDRESS</div>
-                                            <input
-                                                type="text"
-                                                value={person.emailAddress || ""}
-                                                readOnly
+                                        }}
+                                    >
+                                        SEX
+                                        <div
+                                            style={{
+                                                display: "flex",
+                                                justifyContent: "center",
+                                                gap: "40px",
+                                                alignItems: "center",
+                                                fontFamily: "Times new Roman",
+                                                width: "100%",
+                                                marginTop: "5px",
+                                            }}
+                                        >
+                                            <label
                                                 style={{
-                                                    marginTop: "5px",
-                                                    width: "100%",
-                                                    border: "none",
-                                                    outline: "none",
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    gap: "5px",
                                                     fontSize: "15px",
                                                     fontFamily: "Times new Roman",
+                                                    marginBottom: "10px"
                                                 }}
-                                            />
-                                        </td>
-                                    </tr>
+                                            >
+                                                <input
+                                                    type="checkbox"
+                                                    checked={person.gender === 0}
+                                                    readOnly
+                                                    style={{
+                                                        width: "20px",
+                                                        height: "20px",
+                                                        border: "1px solid black",
+                                                        backgroundColor: "white",
+
+                                                        appearance: "none",
+                                                        WebkitAppearance: "none",
+                                                        MozAppearance: "none",
+                                                        display: "inline-block",
+                                                        position: "relative",
+                                                    }}
+                                                    className="custom-checkbox"
+                                                />
+                                                Male
+                                            </label>
+
+                                            <label
+                                                style={{
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    gap: "5px",
+                                                    fontSize: "15px",
+                                                    fontFamily: "Times new Roman",
+                                                    marginBottom: "10px"
+                                                }}
+                                            >
+                                                <input
+                                                    type="checkbox"
+                                                    checked={person.gender === 1}
+                                                    readOnly
+                                                    style={{
+                                                        width: "20px",
+                                                        height: "20px",
+                                                        border: "1px solid black",
+                                                        backgroundColor: "white",
+                                                        appearance: "none",
+                                                        WebkitAppearance: "none",
+                                                        MozAppearance: "none",
+
+                                                        display: "inline-block",
+                                                        position: "relative",
+                                                    }}
+                                                    className="custom-checkbox"
+                                                />
+                                                Female
+                                            </label>
+                                        </div>
+
+                                        {/* ✅ Style block for ✓ checkmark */}
+                                        <style>
+                                            {`
+      .custom-checkbox:checked::after {
+        content: '✓';
+        position: absolute;
+        top: -2px;
+        left: 3px;
+        font-size: 16px;
+        color: black;
+      }
+    `}
+                                        </style>
+                                    </td>
+
+
+
+
+                                    {/* E-MAIL ADDRESS */}
+                                    <td colSpan={10} style={{
+                                        border: "1px solid black",
+                                        textAlign: "left",
+
+                                        fontSize: "14px",
+                                        verticalAlign: "top",
+                                        fontFamily: "Times new Roman",
+                                    }}>
+                                        <div style={{ fontWeight: "bold" }}>E-MAIL ADDRESS</div>
+                                        <input
+                                            type="text"
+                                            value={person.emailAddress || ""}
+                                            readOnly
+                                            style={{
+                                                marginTop: "5px",
+                                                width: "100%",
+                                                border: "none",
+                                                outline: "none",
+                                                fontSize: "15px",
+                                                fontFamily: "Times new Roman",
+                                            }}
+                                        />
+                                    </td>
+                                    <td colSpan={15} style={{
+                                        border: "1px solid black",
+                                        textAlign: "left",
+
+                                        fontSize: "14px",
+                                        verticalAlign: "top",
+                                        fontFamily: "Times new Roman",
+                                    }}>
+                                        <div style={{ fontWeight: "bold" }}>YEAR GRADUATED</div>
+                                        <input
+                                            type="text"
+                                            value={person.yearGraduated1 || ""}
+                                            readOnly
+                                            style={{
+                                                marginTop: "5px",
+                                                width: "100%",
+                                                border: "none",
+                                                outline: "none",
+                                                fontSize: "15px",
+                                                fontFamily: "Times new Roman",
+                                            }}
+                                        />
+                                    </td>
+                                </tr>
     
     
                                     <tr>

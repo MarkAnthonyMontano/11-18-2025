@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
+import { SettingsContext } from "../App";
 import axios from "axios";
 import {
   Box,
@@ -11,6 +12,7 @@ import {
   TableCell,
   TableBody,
   Paper,
+  TableContainer,
   Snackbar,
   Alert,
   Dialog,
@@ -19,10 +21,104 @@ import {
   DialogContentText,
   DialogActions,
 } from "@mui/material";
+import Unauthorized from "../components/Unauthorized";
+import LoadingOverlay from "../components/LoadingOverlay";
+
 
 const API_URL = "http://localhost:5000";
 
 const TOSF = () => {
+  const settings = useContext(SettingsContext);
+
+  const [titleColor, setTitleColor] = useState("#000000");
+  const [subtitleColor, setSubtitleColor] = useState("#555555");
+  const [borderColor, setBorderColor] = useState("#000000");
+  const [mainButtonColor, setMainButtonColor] = useState("#1976d2");
+  const [subButtonColor, setSubButtonColor] = useState("#ffffff");   // ✅ NEW
+  const [stepperColor, setStepperColor] = useState("#000000");       // ✅ NEW
+
+  const [fetchedLogo, setFetchedLogo] = useState(null);
+  const [companyName, setCompanyName] = useState("");
+  const [shortTerm, setShortTerm] = useState("");
+  const [campusAddress, setCampusAddress] = useState("");
+
+  useEffect(() => {
+    if (!settings) return;
+
+    // 🎨 Colors
+    if (settings.title_color) setTitleColor(settings.title_color);
+    if (settings.subtitle_color) setSubtitleColor(settings.subtitle_color);
+    if (settings.border_color) setBorderColor(settings.border_color);
+    if (settings.main_button_color) setMainButtonColor(settings.main_button_color);
+    if (settings.sub_button_color) setSubButtonColor(settings.sub_button_color);   // ✅ NEW
+    if (settings.stepper_color) setStepperColor(settings.stepper_color);           // ✅ NEW
+
+    // 🏫 Logo
+    if (settings.logo_url) {
+      setFetchedLogo(`http://localhost:5000${settings.logo_url}`);
+    } else {
+      setFetchedLogo(EaristLogo);
+    }
+
+    // 🏷️ School Information
+    if (settings.company_name) setCompanyName(settings.company_name);
+    if (settings.short_term) setShortTerm(settings.short_term);
+    if (settings.campus_address) setCampusAddress(settings.campus_address);
+
+  }, [settings]);
+
+  const [userID, setUserID] = useState("");
+  const [user, setUser] = useState("");
+  const [userRole, setUserRole] = useState("");
+  const [hasAccess, setHasAccess] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const pageId = 99;
+
+  const [employeeID, setEmployeeID] = useState("");
+
+  useEffect(() => {
+
+    const storedUser = localStorage.getItem("email");
+    const storedRole = localStorage.getItem("role");
+    const storedID = localStorage.getItem("person_id");
+    const storedEmployeeID = localStorage.getItem("employee_id");
+
+    if (storedUser && storedRole && storedID) {
+      setUser(storedUser);
+      setUserRole(storedRole);
+      setUserID(storedID);
+      setEmployeeID(storedEmployeeID);
+
+      if (storedRole === "registrar") {
+        checkAccess(storedEmployeeID);
+      } else {
+        window.location.href = "/login";
+      }
+    } else {
+      window.location.href = "/login";
+    }
+  }, []);
+
+  const checkAccess = async (employeeID) => {
+    try {
+      const response = await axios.get(`http://localhost:5000/api/page_access/${employeeID}/${pageId}`);
+      if (response.data && response.data.page_privilege === 1) {
+        setHasAccess(true);
+      } else {
+        setHasAccess(false);
+      }
+    } catch (error) {
+      console.error('Error checking access:', error);
+      setHasAccess(false);
+      if (error.response && error.response.data.message) {
+        console.log(error.response.data.message);
+      } else {
+        console.log("An unexpected error occurred.");
+      }
+      setLoading(false);
+    }
+  };
+
   const [tosfData, setTosfData] = useState([]);
   const [formData, setFormData] = useState({
     athletic_fee: "",
@@ -134,19 +230,67 @@ const TOSF = () => {
     setSelectedId(null);
   };
 
+  // ✅ Access Guards
+  if (loading || hasAccess === null) {
+    return <LoadingOverlay open={loading} message="Checking Access..." />;
+  }
+
+  if (!hasAccess) {
+    return <Unauthorized />;
+  }
+
+
   return (
-    <Box sx={{ padding: "0rem 2rem" }}>
-      <Typography
-        variant="h4"
-        sx={{ fontWeight: "bold", color: "maroon", fontSize: "36px" }}
+    <Box
+      sx={{
+        height: "calc(100vh - 150px)",
+        overflowY: "auto",
+        backgroundColor: "transparent",
+        paddingRight: "20px",   // only right spacing
+        boxSizing: "border-box",
+      }}
+    >
+
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "flex-start",
+          alignItems: "center",
+          flexWrap: "wrap",
+          mb: 2,
+        }}
       >
-        TOSF MANAGEMENT
-      </Typography>
+        <Typography
+          variant="h4"
+          sx={{
+            fontWeight: "bold",
+            color: titleColor,
+            fontSize: "36px",
+          }}
+        >
+          TOSF MANAGEMENT
+        </Typography>
+      </Box>
+
       <hr style={{ border: "1px solid #ccc", width: "100%" }} />
       <br />
 
-      {/* Form Section */}
-      <Paper sx={{ padding: 2, mb: 3 }}>
+
+      {/* TITLE */}
+      <TableContainer component={Paper} sx={{ width: "100%", border: `2px solid ${borderColor}` }}>
+        <Table>
+          <TableHead sx={{ backgroundColor: settings?.header_color || "#1976d2" }}>
+            <TableRow>
+              <TableCell sx={{ color: "white", textAlign: "center", fontWeight: "bold" }}>
+                TOSF MANAGEMENT
+              </TableCell>
+            </TableRow>
+          </TableHead>
+        </Table>
+      </TableContainer>
+
+      {/* FORM CONTAINER */}
+      <Paper sx={{ padding: 2, mb: 3, border: `2px solid ${borderColor}` }}>
         <form onSubmit={handleSubmit}>
           <Box
             sx={{
@@ -156,16 +300,19 @@ const TOSF = () => {
             }}
           >
             {Object.keys(formData).map((key) => (
-              <TextField
-                key={key}
-                label={key.replace(/_/g, " ").toUpperCase()}
-                name={key}
-                value={formData[key]}
-                onChange={handleChange}
-                variant="outlined"
-                size="small"
-                required
-              />
+              <Box key={key} sx={{ display: "flex", flexDirection: "column" }}>
+                <Typography sx={{ fontWeight: "500", mb: 0.5 }}>
+                  {key.replace(/_/g, " ").toUpperCase()}
+                </Typography>
+                <TextField
+                  name={key}
+                  value={formData[key]}
+                  onChange={handleChange}
+                  variant="outlined"
+                  size="small"
+                  required
+                />
+              </Box>
             ))}
           </Box>
 
@@ -177,6 +324,7 @@ const TOSF = () => {
             >
               {editingId ? "Update Record" : "Add Record"}
             </Button>
+
             {editingId && (
               <Button
                 onClick={() => {
@@ -203,49 +351,115 @@ const TOSF = () => {
         </form>
       </Paper>
 
-      {/* Table Section */}
-      <Paper>
+      {/* TABLE SECTION */}
+      <TableContainer component={Paper} sx={{ border: `2px solid ${borderColor}` }}>
         <Table>
-          <TableHead>
+          <TableHead
+            style={{
+              border: `2px solid ${borderColor}`,
+              backgroundColor: settings?.header_color || "#1976d2",
+            }}
+          >
             <TableRow>
-              <TableCell><b>ID</b></TableCell>
-              <TableCell><b>Athletic Fee</b></TableCell>
-              <TableCell><b>Cultural Fee</b></TableCell>
-              <TableCell><b>Developmental Fee</b></TableCell>
-              <TableCell><b>Guidance Fee</b></TableCell>
-              <TableCell><b>Library Fee</b></TableCell>
-              <TableCell><b>Medical & Dental</b></TableCell>
-              <TableCell><b>Registration Fee</b></TableCell>
-              <TableCell><b>Computer Fee</b></TableCell>
-              <TableCell><b>Actions</b></TableCell>
+              {[
+                "ID",
+                "Athletic Fee",
+                "Cultural Fee",
+                "Developmental Fee",
+                "Guidance Fee",
+                "Library Fee",
+                "Medical & Dental",
+                "Registration Fee",
+                "Computer Fee",
+                "Actions",
+              ].map((header) => (
+                <TableCell
+                  key={header}
+                  style={{
+                    border: `2px solid ${borderColor}`,
+                    color: "white",
+                    textAlign: "center",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {header}
+                </TableCell>
+              ))}
             </TableRow>
           </TableHead>
+
           <TableBody>
             {tosfData.map((item) => (
               <TableRow key={item.tosf_id}>
-                <TableCell>{item.tosf_id}</TableCell>
-                <TableCell>{item.athletic_fee}</TableCell>
-                <TableCell>{item.cultural_fee}</TableCell>
-                <TableCell>{item.developmental_fee}</TableCell>
-                <TableCell>{item.guidance_fee}</TableCell>
-                <TableCell>{item.library_fee}</TableCell>
-                <TableCell>{item.medical_and_dental_fee}</TableCell>
-                <TableCell>{item.registration_fee}</TableCell>
-                <TableCell>{item.computer_fee}</TableCell>
-                <TableCell>
+                <TableCell style={{ border: `2px solid ${borderColor}`, textAlign: "center" }}>
+                  {item.tosf_id}
+                </TableCell>
+
+                <TableCell style={{ border: `2px solid ${borderColor}`, textAlign: "center" }}>
+                  {item.athletic_fee}
+                </TableCell>
+
+                <TableCell style={{ border: `2px solid ${borderColor}`, textAlign: "center" }}>
+                  {item.cultural_fee}
+                </TableCell>
+
+                <TableCell style={{ border: `2px solid ${borderColor}`, textAlign: "center" }}>
+                  {item.developmental_fee}
+                </TableCell>
+
+                <TableCell style={{ border: `2px solid ${borderColor}`, textAlign: "center" }}>
+                  {item.guidance_fee}
+                </TableCell>
+
+                <TableCell style={{ border: `2px solid ${borderColor}`, textAlign: "center" }}>
+                  {item.library_fee}
+                </TableCell>
+
+                <TableCell style={{ border: `2px solid ${borderColor}`, textAlign: "center" }}>
+                  {item.medical_and_dental_fee}
+                </TableCell>
+
+                <TableCell style={{ border: `2px solid ${borderColor}`, textAlign: "center" }}>
+                  {item.registration_fee}
+                </TableCell>
+
+                <TableCell style={{ border: `2px solid ${borderColor}`, textAlign: "center" }}>
+                  {item.computer_fee}
+                </TableCell>
+
+                {/* ACTIONS SIDE BY SIDE */}
+                <TableCell
+                  style={{
+                    border: `2px solid ${borderColor}`,
+                    textAlign: "center",
+                    whiteSpace: "nowrap",
+                  }}
+                >
                   <Button
                     onClick={() => handleEdit(item)}
-                    variant="outlined"
                     size="small"
-                    sx={{ mr: 1 }}
+                    sx={{
+                      backgroundColor: "green",
+                      color: "white",
+                      borderRadius: "5px",
+                      marginRight: "6px",
+                      width: "85px",
+                      height: "35px",
+                    }}
                   >
                     Edit
                   </Button>
+
                   <Button
                     onClick={() => handleDeleteDialog(item.tosf_id)}
-                    variant="contained"
-                    color="error"
                     size="small"
+                    sx={{
+                      backgroundColor: "#9E0000",
+                      color: "white",
+                      borderRadius: "5px",
+                      width: "85px",
+                      height: "35px",
+                    }}
                   >
                     Delete
                   </Button>
@@ -254,7 +468,7 @@ const TOSF = () => {
             ))}
           </TableBody>
         </Table>
-      </Paper>
+      </TableContainer>
 
       {/* Snackbar */}
       <Snackbar

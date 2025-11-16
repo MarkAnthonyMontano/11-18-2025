@@ -460,7 +460,7 @@ const AssignScheduleToApplicants = () => {
 
     const assignCount = Math.min(customCount, availableSlots);
 
-    const unassigned = persons
+    const unassigned = currentPersons
       .filter(a => a.schedule_id == null)
       .slice(0, assignCount)
       .map(a => a.applicant_number);

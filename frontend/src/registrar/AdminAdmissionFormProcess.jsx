@@ -481,30 +481,7 @@ const settings = useContext(SettingsContext);
                     gap: "10px",            // ✅ 10px space between them
                   }}
                 >
-                  {/* Profile Image (2x2) */}
-                  <div
-                    style={{
-                      width: "1.3in",
-                      height: "1.3in",
-                      border: "1px solid black",
-                      overflow: "hidden",
-                      flexShrink: 0,
-                    }}
-                  >
-                    {person?.profile_img ? (
-                      <img
-                        src={`http://localhost:5000/uploads/${person.profile_img}`}
-                        alt="Profile"
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                        }}
-                      />
-                    ) : (
-                      <span style={{ fontSize: "12px", color: "#888" }}>No Image</span>
-                    )}
-                  </div>
+               
 
                   <div
                     style={{

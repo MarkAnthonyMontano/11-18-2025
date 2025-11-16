@@ -433,7 +433,7 @@ const AssignScheduleToApplicantsInterviewer = () => {
     }
 
     // ✅ Filter all unassigned applicants first
-    const filteredPersons = persons.filter(a => a.schedule_id == null);
+    const filteredPersons = currentPersons.filter(a => a.schedule_id == null);
 
     if (filteredPersons.length === 0) {
         setSnack({ open: true, message: "No unassigned applicants available.", severity: "warning" });
@@ -525,7 +525,7 @@ const AssignScheduleToApplicantsInterviewer = () => {
 
         const assignCount = Math.min(customCount, availableSlots);
 
-        const unassigned = persons
+        const unassigned = currentPersons
             .filter(a => a.schedule_id == null)
             .slice(0, assignCount)
             .map(a => a.applicant_number);
@@ -591,12 +591,7 @@ const AssignScheduleToApplicantsInterviewer = () => {
 
         // Get the selected applicant from persons based on selectedApplicants set
         const selectedId = Array.from(selectedApplicants)[0];
-        const applicant = persons.find(a => a.applicant_number === selectedId);
-
-        if (!applicant) {
-            setSnack({ open: true, message: "Please select an applicant first.", severity: "warning" });
-            return;
-        }
+        const applicant = currentPersons.find(a => a.applicant_number === selectedId);
 
         const sched = schedules.find(s => s.schedule_id === selectedSchedule);
         if (!sched) {

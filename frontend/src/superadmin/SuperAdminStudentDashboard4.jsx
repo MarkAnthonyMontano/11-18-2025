@@ -129,42 +129,43 @@ const SuperAdminStudentDashboard4 = () => {
 
 
     const location = useLocation();
+  
     const queryParams = new URLSearchParams(location.search);
     const queryPersonId = queryParams.get("person_id")?.trim() || "";
-
-
-
+  
     useEffect(() => {
-        const storedUser = localStorage.getItem("email");
-        const storedRole = localStorage.getItem("role");
-        const loggedInPersonId = localStorage.getItem("person_id");
-        const searchedPersonId = sessionStorage.getItem("admin_edit_person_id");
-
-        if (!storedUser || !storedRole || !loggedInPersonId) {
-            window.location.href = "/login";
-            return;
-        }
-
-        setUser(storedUser);
-        setUserRole(storedRole);
-
-        // Roles that can access
-        const allowedRoles = ["registrar", "applicant", "superadmin"];
-        if (allowedRoles.includes(storedRole)) {
-            // ✅ Always take URL param first
-            const targetId = queryPersonId || searchedPersonId || loggedInPersonId;
-
-            // Save it so other pages (ECAT, forms) can use it
-            sessionStorage.setItem("admin_edit_person_id", targetId);
-
-            setUserID(targetId);
-            fetchByPersonId(targetId);
-            return;
-        }
-
+      const storedUser = localStorage.getItem("email");
+      const storedRole = localStorage.getItem("role");
+      const loggedInPersonId = localStorage.getItem("person_id");
+  
+      if (!storedUser || !storedRole || !loggedInPersonId) {
         window.location.href = "/login";
+        return;
+      }
+  
+      setUser(storedUser);
+      setUserRole(storedRole);
+  
+      // Roles allowed
+      const allowedRoles = ["registrar", "applicant", "superadmin"];
+      if (!allowedRoles.includes(storedRole)) {
+        window.location.href = "/login";
+        return;
+      }
+  
+      // ❌ DO NOT load sessionStorage default
+      // ❌ DO NOT auto-load from previous page
+      // ❌ Only load if URL has ?person_id=
+      if (queryPersonId !== "") {
+        sessionStorage.setItem("admin_edit_person_id", queryPersonId);
+        setUserID(queryPersonId);
+      } else {
+        // clear old saved user
+        sessionStorage.removeItem("admin_edit_person_id");
+        setUserID("");
+      }
     }, [queryPersonId]);
-
+  
     const [selectedPerson, setSelectedPerson] = useState(null);
 
     const fetchByPersonId = async (personID) => {

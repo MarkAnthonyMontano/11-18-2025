@@ -2491,33 +2491,47 @@ app.get("/exam_schedules", async (req, res) => {
   }
 });
 
-// Get schedules with current occupancy count
-app.get("/exam_schedules_with_count", async (req, res) => {
+app.get("/exam_schedules_with_count/:yearId/:semesterId", async (req, res) => {
+  const { yearId, semesterId } = req.params;
+
   try {
-    const [rows] = await db.execute(`
+    const [rows] = await db.query(`
       SELECT 
         ees.schedule_id,
         ees.day_description,
         ees.building_description,
         ees.room_description,
         ees.start_time,
-        ees.proctor,
         ees.end_time,
+        ees.proctor,
         ees.room_quota,
         ees.created_at,
         COUNT(ea.applicant_id) AS current_occupancy
       FROM admission.entrance_exam_schedule ees
+      
+      -- JOIN enrollment.year_table TO FILTER
+      JOIN enrollment.year_table yt 
+        ON yt.status = 1
+        AND yt.year_id = ?
+      
+      -- JOIN enrollment.semester_table TO FILTER
+      JOIN enrollment.semester_table st
+        ON st.semester_id = ?
+      
       LEFT JOIN admission.exam_applicants ea
         ON ees.schedule_id = ea.schedule_id
+        
       GROUP BY ees.schedule_id
-      ORDER BY ees.day_description, ees.start_time
-    `);
+      ORDER BY ees.day_description, ees.start_time;
+    `, [yearId, semesterId]);
+
     res.json(rows);
   } catch (err) {
-    console.error("❌ Error fetching exam schedules with count:", err);
+    console.error("Error:", err);
     res.status(500).send("Server error");
   }
 });
+
 
 // 📌 Import Excel to person_status_table
 // 📌 Import Excel to person_status_table + log notifications
@@ -7041,6 +7055,8 @@ app.get("/exam_schedules_with_count", async (req, res) => {
     res.status(500).json({ error: "Database error" });
   }
 });
+
+
 
 
 //READ ENROLLED USERS (UPDATED!)

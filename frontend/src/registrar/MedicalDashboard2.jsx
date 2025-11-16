@@ -165,43 +165,47 @@ const MedicalDashboard2 = () => {
 
     const location = useLocation();
  
-   const queryParams = new URLSearchParams(location.search);
-   const queryPersonId = queryParams.get("person_id")?.trim() || "";
+  const queryParams = new URLSearchParams(location.search);
+     const queryPersonId = queryParams.get("person_id")?.trim() || "";
  
-   useEffect(() => {
-     const storedUser = localStorage.getItem("email");
-     const storedRole = localStorage.getItem("role");
-     const loggedInPersonId = localStorage.getItem("person_id");
+     useEffect(() => {
+         const storedUser = localStorage.getItem("email");
+         const storedRole = localStorage.getItem("role");
+         const loggedInPersonId = localStorage.getItem("person_id");
  
-     if (!storedUser || !storedRole || !loggedInPersonId) {
-       window.location.href = "/login";
-       return;
-     }
+         if (!storedUser || !storedRole || !loggedInPersonId) {
+             window.location.href = "/login";
+             return;
+         }
  
-     setUser(storedUser);
-     setUserRole(storedRole);
+         setUser(storedUser);
+         setUserRole(storedRole);
  
-     // Roles allowed
-     const allowedRoles = ["registrar", "applicant", "superadmin"];
-     if (!allowedRoles.includes(storedRole)) {
-       window.location.href = "/login";
-       return;
-     }
+         const allowedRoles = ["registrar", "applicant", "superadmin"];
+         if (!allowedRoles.includes(storedRole)) {
+             window.location.href = "/login";
+             return;
+         }
  
-     // ❌ DO NOT load sessionStorage default
-     // ❌ DO NOT auto-load from previous page
-     // ❌ Only load if URL has ?person_id=
-     if (queryPersonId !== "") {
-       sessionStorage.setItem("admin_edit_person_id", queryPersonId);
-       setUserID(queryPersonId);
-     } else {
-       // clear old saved user
-       sessionStorage.removeItem("admin_edit_person_id");
-       setUserID("");
-     }
-   }, [queryPersonId]);
+         const lastSelected = sessionStorage.getItem("admin_edit_person_id");
  
-
+         // ⭐ CASE 1: URL HAS ?person_id=
+         if (queryPersonId !== "") {
+             sessionStorage.setItem("admin_edit_person_id", queryPersonId);
+             setUserID(queryPersonId);
+             return;
+         }
+ 
+         // ⭐ CASE 2: URL has NO ID but we have a last selected student
+         if (lastSelected) {
+             setUserID(lastSelected);
+             return;
+         }
+ 
+         fetchByPersonId(targetId);
+         setUserID("");
+     }, [queryPersonId]);
+ 
     const [selectedPerson, setSelectedPerson] = useState(null);
 
 
@@ -594,13 +598,28 @@ const MedicalDashboard2 = () => {
 
 
 
-    const links = [
-        { to: "/admin_ecat_application_form", label: "ECAT Application Form" },
-        { to: "/admin_admission_form_process", label: "Admission Form Process" },
-        { to: "/admin_personal_data_form", label: "Personal Data Form" },
-        { to: "/admin_office_of_the_registrar", label: `Application For ${shortTerm ? shortTerm.toUpperCase() : ""} College Admission` },
-        { to: "/admission_services", label: "Application/Student Satisfactory Survey" },
-    ];
+
+ const links = [
+    {
+      to: userID ? `/admin_ecat_application_form?person_id=${userID}` : "/admin_ecat_application_form",
+      label: "ECAT Application Form",
+    },
+    {
+      to: userID ? `/admin_admission_form_process?person_id=${userID}` : "/admin_admission_form_process",
+      label: "Admission Form Process",
+    },
+    {
+      to: userID ? `/admin_personal_data_form?person_id=${userID}` : "/admin_personal_data_form",
+      label: "Personal Data Form",
+    },
+    {
+      to: userID ? `/admin_office_of_the_registrar?person_id=${userID}` : "/admin_office_of_the_registrar",
+      label: `Application For ${shortTerm ? shortTerm.toUpperCase() : ""} College Admission`,
+    },
+    { to: "/admission_services", label: "Application/Student Satisfactory Survey" },
+   
+  ];
+
 
 
     const [canPrintPermit, setCanPrintPermit] = useState(false);

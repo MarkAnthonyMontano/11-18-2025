@@ -10,8 +10,8 @@ import ForwardIcon from '@mui/icons-material/Forward';
 import { QRCodeSVG } from "qrcode.react";
 
 const AdminAdmissionFormProcess = () => {
-  
-const settings = useContext(SettingsContext);
+
+  const settings = useContext(SettingsContext);
 
   const [titleColor, setTitleColor] = useState("#000000");
   const [subtitleColor, setSubtitleColor] = useState("#555555");
@@ -47,7 +47,7 @@ const settings = useContext(SettingsContext);
     if (settings.short_term) setShortTerm(settings.short_term);
     if (settings.campus_address) setCampusAddress(settings.campus_address);
 
-  }, [settings]); 
+  }, [settings]);
 
 
   const words = companyName.trim().split(" ");
@@ -116,7 +116,7 @@ const settings = useContext(SettingsContext);
 
   const [campusAddress, setCampusAddress] = useState("");
 
- 
+
   useEffect(() => {
     if (settings && settings.address) {
       setCampusAddress(settings.address);
@@ -138,12 +138,10 @@ const settings = useContext(SettingsContext);
   const queryParams = new URLSearchParams(location.search);
   const queryPersonId = queryParams.get("person_id");
 
-  // do not alter
   useEffect(() => {
     const storedUser = localStorage.getItem("email");
     const storedRole = localStorage.getItem("role");
     const loggedInPersonId = localStorage.getItem("person_id");
-    const searchedPersonId = sessionStorage.getItem("admin_edit_person_id");
 
     if (!storedUser || !storedRole || !loggedInPersonId) {
       window.location.href = "/login";
@@ -153,17 +151,23 @@ const settings = useContext(SettingsContext);
     setUser(storedUser);
     setUserRole(storedRole);
 
-    // Allow Applicant, Admin, SuperAdmin to view ECAT
     const allowedRoles = ["registrar", "applicant", "student"];
-    if (allowedRoles.includes(storedRole)) {
-      const targetId = searchedPersonId || queryPersonId || loggedInPersonId;
-      setUserID(targetId);
-      fetchPersonData(targetId);
+    if (!allowedRoles.includes(storedRole)) {
+      window.location.href = "/login";
       return;
     }
 
-    window.location.href = "/login";
+    // ⭐ ONLY LOAD IF URL HAS ?person_id=
+    if (queryPersonId && queryPersonId.trim() !== "") {
+      setUserID(queryPersonId);
+      fetchPersonData(queryPersonId);
+    } else {
+      // CLEAR — do not load any old data
+      setUserID("");
+      setPerson({});
+    }
   }, [queryPersonId]);
+
 
 
 
@@ -481,7 +485,7 @@ const settings = useContext(SettingsContext);
                     gap: "10px",            // ✅ 10px space between them
                   }}
                 >
-               
+
 
                   <div
                     style={{
@@ -1245,7 +1249,7 @@ const settings = useContext(SettingsContext);
                     gap: "10px",            // ✅ 10px space between them
                   }}
                 >
-                 
+
                   <div
                     style={{
                       width: "1.3in",

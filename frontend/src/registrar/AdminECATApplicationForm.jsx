@@ -149,36 +149,38 @@ const ECATApplicationForm = () => {
 
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  const queryPersonId = queryParams.get("person_id");
-
-  // do not alter
-  useEffect(() => {
-    const storedUser = localStorage.getItem("email");
-    const storedRole = localStorage.getItem("role");
-    const loggedInPersonId = localStorage.getItem("person_id");
-    const searchedPersonId = sessionStorage.getItem("admin_edit_person_id");
-
-    if (!storedUser || !storedRole || !loggedInPersonId) {
-      window.location.href = "/login";
-      return;
-    }
-
-    setUser(storedUser);
-    setUserRole(storedRole);
-
-    // Allow Applicant, Admin, SuperAdmin to view ECAT
-    const allowedRoles = ["registrar", "applicant", "student"];
-    if (allowedRoles.includes(storedRole)) {
-      const targetId = searchedPersonId || queryPersonId || loggedInPersonId;
-      setUserID(targetId);
-      fetchPersonData(targetId);
-      return;
-    }
-
-    window.location.href = "/login";
-  }, [queryPersonId]);
-
-
+   const queryPersonId = queryParams.get("person_id");
+ 
+   useEffect(() => {
+     const storedUser = localStorage.getItem("email");
+     const storedRole = localStorage.getItem("role");
+     const loggedInPersonId = localStorage.getItem("person_id");
+ 
+     if (!storedUser || !storedRole || !loggedInPersonId) {
+       window.location.href = "/login";
+       return;
+     }
+ 
+     setUser(storedUser);
+     setUserRole(storedRole);
+ 
+     const allowedRoles = ["registrar", "applicant", "student"];
+     if (!allowedRoles.includes(storedRole)) {
+       window.location.href = "/login";
+       return;
+     }
+ 
+     // ⭐ ONLY LOAD IF URL HAS ?person_id=
+     if (queryPersonId && queryPersonId.trim() !== "") {
+       setUserID(queryPersonId);
+       fetchPersonData(queryPersonId);
+     } else {
+       // CLEAR — do not load any old data
+       setUserID("");
+       setPerson({});
+     }
+   }, [queryPersonId]);
+ 
 
   const [shortDate, setShortDate] = useState("");
 
